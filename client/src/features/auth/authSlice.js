@@ -27,8 +27,9 @@ const auth = createSlice({
       localStorage.removeItem('token');
       // Remove auth header for future requests
       setAuthToken(false);
-      // Set current user to empty object {} which will set isAuthenticated to false
-      auth.caseReducers.setCurrentUser({});
+      // Set isAuthenticated to false and user to {}
+      state.isAuthenticated = false;
+      state.user = {};
     }
   }
 });
@@ -42,8 +43,8 @@ export const registerUser = (data, history) => async dispatch => {
     // dispatch(setCurrentUser(user));
     history.push('/login');
   } catch (err) {
-    dispatch(authFailed(err.response.data));
-    console.log(err.response.data);
+    dispatch(authFailed(err.data));
+    console.log(err.data);
   }
 };
 
@@ -60,8 +61,7 @@ export const loginUser = data => async dispatch => {
     // Set current user
     dispatch(setCurrentUser(decoded));
   } catch (err) {
-    console.log(err);
-    dispatch(authFailed(err.response.data));
-    console.log(err.response.data);
+    dispatch(authFailed(err.data));
+    console.log(err.data);
   }
 };
