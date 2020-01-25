@@ -1,4 +1,4 @@
 module.exports = {
-  mongoURI: 'mongodb://admin:admin123@ds041228.mlab.com:41228/player-database',
-  secretOrKey: 'theMostSecretPhraseEver123!@#'
+  mongoURI: 'YOUR_MONGO_URI_HERE',
+  secretOrKey: 'secret'
 };
