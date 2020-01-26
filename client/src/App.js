@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import Register from '../pages/Register';
-import Login from '../pages/Login';
-import Dashboard from '../pages/Dashboard';
-import Navbar from './layout/Navbar';
-import Landing from './layout/Landing';
-import PrivateRoute from './private-route/PrivateRoute';
-import checkAuth from '../utils/checkAuth';
-import store from '../store';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Navbar from './components/layout/Navbar';
+import Landing from './components/layout/Landing';
+import PrivateRoute from './components/private-route/PrivateRoute';
+import checkAuth from './utils/checkAuth';
+import store from './store';
 
 const App = () => {
   // Check if user is already logged in

@@ -51,35 +51,29 @@ const Login = () => {
               <input
                 onChange={e => setEmail(e.target.value)}
                 value={email}
-                error={errors.email}
+                error={errors.auth}
                 id="email"
                 type="email"
                 className={classnames('', {
-                  invalid: errors.email || errors.emailnotfound
+                  invalid: errors.auth || errors.email
                 })}
               />
               <label htmlFor="email">Email</label>
-              <span className="red-text">
-                {errors.email}
-                {errors.emailnotfound}
-              </span>
+              <span className="red-text">{errors.email}</span>
             </div>
             <div className="input-field col s12">
               <input
                 onChange={e => setPassword(e.target.value)}
                 value={password}
-                error={errors.password}
+                error={errors.auth}
                 id="password"
                 type="password"
                 className={classnames('', {
-                  invalid: errors.password || errors.passwordincorrect
+                  invalid: errors.auth
                 })}
               />
               <label htmlFor="password">Password</label>
-              <span className="red-text">
-                {errors.password}
-                {errors.passwordincorrect}
-              </span>
+              <span className="red-text">{errors.auth}</span>
             </div>
             <div className="col s12" style={{ paddingLeft: '11.250px' }}>
               <button

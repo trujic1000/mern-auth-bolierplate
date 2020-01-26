@@ -1,109 +1,148 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const keys = require("../../config/keys");
-const passport = require("passport");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const auth = require('../../middleware/auth');
+const { validationResult } = require('express-validator');
 
 // Load input validation
-const validateRegisterInput = require("../../validation/register");
-const validateLoginInput = require("../../validation/login");
+const {
+  validateRegisterInput,
+  validateLoginInput
+} = require('../../validation/auth');
 
 // Load User model
-const User = require("../../models/User");
+const User = require('../../models/User');
 
 // @route POST api/users/register
 // @desc Register user
 // @access Public
-router.post("/register", (req, res) => {
-  // Form validation
-
-  const { errors, isValid } = validateRegisterInput(req.body);
-
+router.post('/register', validateRegisterInput(), async (req, res) => {
   // Check validation
-  if (!isValid) {
-    return res.status(400).json(errors);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    // Formatting errors to return object instead of an array
+    const formattedErrors = errors.array().reduce((acc, current) => {
+      acc[current['param']] = current.msg;
+      return acc;
+    }, {});
+    return res.status(400).json(formattedErrors);
   }
 
-  User.findOne({ email: req.body.email }).then(user => {
-    if (user) {
-      return res.status(400).json({ email: "Email already exists" });
-    } else {
-      const newUser = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-      });
+  const { name, email, password } = req.body;
 
-      // Hash password before saving in database
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then(user => res.json(user))
-            .catch(err => console.log(err));
-        });
-      });
+  try {
+    let user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
     }
-  });
+
+    user = new User({
+      name,
+      email,
+      password
+    });
+
+    const salt = await bcrypt.genSalt(10);
+
+    user.password = await bcrypt.hash(password, salt);
+
+    await user.save();
+
+    const payload = {
+      user: {
+        id: user.id,
+        name: user.name
+      }
+    };
+
+    jwt.sign(
+      payload,
+      config.get('secretOrKey'),
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.json({
+          success: true,
+          token: 'Bearer ' + token
+        });
+      }
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 });
 
 // @route POST api/users/login
 // @desc Login user and return JWT token
 // @access Public
-router.post("/login", (req, res) => {
-  // Form validation
-
-  const { errors, isValid } = validateLoginInput(req.body);
-
-  // Check validation
-  if (!isValid) {
-    return res.status(400).json(errors);
+router.post('/login', validateLoginInput(), async (req, res) => {
+  // Check Validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    // Formatting errors to return object instead of an array
+    const formattedErrors = errors.array().reduce((acc, current) => {
+      acc[current['param']] = current.msg;
+      return acc;
+    }, {});
+    return res.status(400).json(formattedErrors);
   }
 
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email, password } = req.body;
 
   // Find user by email
-  User.findOne({ email }).then(user => {
-    // Check if user exists
+  try {
+    let user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(404).json({ emailnotfound: "Email not found" });
+      return res.status(400).json({ auth: 'Invalid Credentials' });
     }
 
-    // Check password
-    bcrypt.compare(password, user.password).then(isMatch => {
-      if (isMatch) {
-        // User matched
-        // Create JWT Payload
-        const payload = {
-          id: user.id,
-          name: user.name
-        };
+    const isMatch = await bcrypt.compare(password, user.password);
 
-        // Sign token
-        jwt.sign(
-          payload,
-          keys.secretOrKey,
-          {
-            expiresIn: 31556926 // 1 year in seconds
-          },
-          (err, token) => {
-            res.json({
-              success: true,
-              token: "Bearer " + token
-            });
-          }
-        );
-      } else {
-        return res
-          .status(400)
-          .json({ passwordincorrect: "Password incorrect" });
+    if (!isMatch) {
+      return res.status(400).json({ auth: 'Invalid Credentials' });
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+        name: user.name
       }
-    });
-  });
+    };
+
+    jwt.sign(
+      payload,
+      config.get('secretOrKey'),
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.json({
+          success: true,
+          token: 'Bearer ' + token
+        });
+      }
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route    GET api/users/current
+// @desc     Get user by token
+// @access   Private
+router.get('/current', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
 });
 
 module.exports = router;

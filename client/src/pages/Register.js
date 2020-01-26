@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-// import { registerUser } from '../actions/authActions';
 import { registerUser } from '../features/auth/authSlice';
 import classnames from 'classnames';
 
@@ -19,7 +18,7 @@ const Register = () => {
   // If logged in and user navigates to Register page, should redirect them to dashboard
   useEffect(() => {
     if (isAuth) history.push('/dashboard');
-  }, []);
+  }, [isAuth]);
 
   const onSubmit = e => {
     e.preventDefault();
@@ -31,8 +30,7 @@ const Register = () => {
       password2
     };
 
-    dispatch(registerUser(newUser, history));
-    // this.props.registerUser(newUser, this.props.history);
+    dispatch(registerUser(newUser));
   };
 
   return (

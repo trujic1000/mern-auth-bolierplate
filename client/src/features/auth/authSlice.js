@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import jwt_decode from 'jwt-decode';
-import isEmpty from 'is-empty';
 import { signUp, login } from '../../api/authAPI';
 import setAuthToken from '../../utils/setAuthToken';
 
@@ -16,13 +15,15 @@ const auth = createSlice({
   initialState,
   reducers: {
     setCurrentUser: (state, action) => {
-      state.isAuthenticated = !isEmpty(action.payload);
+      state.isAuthenticated = true;
       state.user = action.payload;
+      state.errors = {};
     },
     authFailed: (state, action) => {
+      state.isAuthenticated = false;
       state.errors = action.payload;
     },
-    logoutUser: () => {
+    logoutUser: state => {
       // Remove token from local storage
       localStorage.removeItem('token');
       // Remove auth header for future requests
@@ -37,11 +38,17 @@ const auth = createSlice({
 export const { setCurrentUser, logoutUser, authFailed } = auth.actions;
 export default auth.reducer;
 
-export const registerUser = (data, history) => async dispatch => {
+export const registerUser = data => async dispatch => {
   try {
-    await signUp(data);
-    // dispatch(setCurrentUser(user));
-    history.push('/login');
+    const res = await signUp(data);
+    // Set token to local storage
+    localStorage.setItem('token', res.token);
+    // Set token to Auth header
+    setAuthToken(res.token);
+    // Decode token to get user data
+    const decoded = jwt_decode(res.token);
+    // Set current user
+    dispatch(setCurrentUser(decoded.user));
   } catch (err) {
     dispatch(authFailed(err.data));
     console.log(err.data);
@@ -51,15 +58,14 @@ export const registerUser = (data, history) => async dispatch => {
 export const loginUser = data => async dispatch => {
   try {
     const res = await login(data);
-    const token = res.token;
     // Set token to local storage
-    localStorage.setItem('token', token);
+    localStorage.setItem('token', res.token);
     // Set token to Auth header
-    setAuthToken(token);
+    setAuthToken(res.token);
     // Decode token to get user data
-    const decoded = jwt_decode(token);
+    const decoded = jwt_decode(res.token);
     // Set current user
-    dispatch(setCurrentUser(decoded));
+    dispatch(setCurrentUser(decoded.user));
   } catch (err) {
     dispatch(authFailed(err.data));
     console.log(err.data);

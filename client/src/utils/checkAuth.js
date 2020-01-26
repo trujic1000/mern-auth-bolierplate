@@ -11,13 +11,12 @@ const checkAuth = store => {
     // Decode token and get user info and exp
     const decoded = jwt_decode(token);
     // Set user and isAuthenticated
-    store.dispatch(setCurrentUser(decoded));
+    store.dispatch(setCurrentUser(decoded.user));
     // Check for expired token
     const currentTime = Date.now() / 1000; // to get in milliseconds
     if (decoded.exp < currentTime) {
       // Logout user
       store.dispatch(logoutUser());
-
       // Redirect to login
       window.location.href = './login';
     }
