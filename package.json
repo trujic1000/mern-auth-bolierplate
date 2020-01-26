@@ -1,7 +1,7 @@
 {
-  "name": "player-database",
+  "name": "mern-app-boilerplate",
   "version": "1.0.0",
-  "description": "First Women's Pro Football Database",
+  "description": "MERN app boilerplate",
   "main": "server.js",
   "scripts": {
     "client-install": "npm install --prefix client",
