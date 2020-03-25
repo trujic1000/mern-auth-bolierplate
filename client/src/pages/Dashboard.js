@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { logoutUser } from '../features/auth/authSlice';
+import { logoutUser } from 'features/auth/authSlice';
 
 const Dashboard = () => {
   // Get user from state
@@ -13,12 +13,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ height: '75vh' }} className="container valign-wrapper">
-      <div className="row">
-        <div className="landing-copy col s12 center-align">
+    <div style={{ height: '75vh' }} className='container valign-wrapper'>
+      <div className='row'>
+        <div className='landing-copy col s12 center-align'>
           <h4>
             <b>Hey there,</b> {user.name.split(' ')[0]}
-            <p className="flow-text grey-text text-darken-1">
+            <p className='flow-text grey-text text-darken-1'>
               You are logged into a full-stack{' '}
               <span style={{ fontFamily: 'monospace' }}>MERN</span> app 👏
             </p>
@@ -31,7 +31,7 @@ const Dashboard = () => {
               marginTop: '1rem'
             }}
             onClick={onLogoutClick}
-            className="btn btn-large waves-effect waves-light hoverable blue accent-3"
+            className='btn btn-large waves-effect waves-light hoverable blue accent-3'
           >
             Logout
           </button>

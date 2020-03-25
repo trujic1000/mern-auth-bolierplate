@@ -27,6 +27,9 @@ router.post('/register', validateRegisterInput(), async (req, res) => {
       acc[current['param']] = current.msg;
       return acc;
     }, {});
+    if (req.body.password !== req.body.password2) {
+      formattedErrors.password2 = 'Passwords do not match';
+    }
     return res.status(400).json(formattedErrors);
   }
 
@@ -36,7 +39,7 @@ router.post('/register', validateRegisterInput(), async (req, res) => {
     let user = await User.findOne({ email });
 
     if (user) {
-      return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+      return res.status(400).json({ email: 'User already exists' });
     }
 
     user = new User({

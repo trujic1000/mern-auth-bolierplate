@@ -1,6 +1,6 @@
 import jwt_decode from 'jwt-decode';
 import setAuthToken from './setAuthToken';
-import { logoutUser, setCurrentUser } from '../features/auth/authSlice';
+import { logoutUser, setCurrentUser } from 'features/auth/authSlice';
 
 const checkAuth = store => {
   // Check for token to keep user logged in

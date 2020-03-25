@@ -17,13 +17,13 @@ const App = () => {
   }, []);
   return (
     <Router>
-      <div className="App">
+      <div className='App'>
         <Navbar />
-        <Route exact path="/" component={Landing} />
-        <Route exact path="/register" component={Register} />
-        <Route exact path="/login" component={Login} />
+        <Route exact path='/' component={Landing} />
+        <Route exact path='/register' component={Register} />
+        <Route exact path='/login' component={Login} />
         <Switch>
-          <PrivateRoute exact path="/dashboard" component={Dashboard} />
+          <PrivateRoute exact path='/dashboard' component={Dashboard} />
         </Switch>
       </div>
     </Router>
