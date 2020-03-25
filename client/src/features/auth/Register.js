@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { register } from 'features/auth/authSlice';
 import classnames from 'classnames';
+
+import { register, clearErrors } from 'features/auth/authSlice';
+import Icon from 'assets/Icon';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -14,11 +16,11 @@ const Register = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const isAuth = useSelector(state => state.auth.isAuthenticated);
+  const { isAuthenticated, loading } = useSelector(state => state.auth);
   // If logged in and user navigates to Register page, should redirect them to dashboard
   useEffect(() => {
-    if (isAuth) history.push('/dashboard');
-  }, [isAuth]);
+    if (isAuthenticated) history.push('/dashboard');
+  }, [isAuthenticated]);
 
   const onSubmit = e => {
     e.preventDefault();
@@ -37,7 +39,11 @@ const Register = () => {
     <div className='container'>
       <div className='row'>
         <div className='col s8 offset-s2'>
-          <Link to='/' className='btn-flat waves-effect'>
+          <Link
+            to='/'
+            onClick={() => dispatch(clearErrors())}
+            className='btn-flat waves-effect'
+          >
             <i className='material-icons left'>keyboard_backspace</i> Back to
             home
           </Link>
@@ -112,12 +118,20 @@ const Register = () => {
                   width: '150px',
                   borderRadius: '3px',
                   letterSpacing: '1.5px',
-                  marginTop: '1rem'
+                  marginTop: '1rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
                 }}
                 type='submit'
                 className='btn btn-large waves-effect waves-light hoverable blue accent-3'
+                disabled={loading === 'pending'}
               >
-                Sign up
+                {loading === 'pending' ? (
+                  <Icon name='spinner' />
+                ) : (
+                  <span>Sign Up</span>
+                )}
               </button>
             </div>
           </form>

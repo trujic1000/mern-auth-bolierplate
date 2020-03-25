@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import Register from './pages/Register';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import { Register, Login } from './features/auth';
+import { Dashboard } from './features/dashboard';
 import Navbar from './components/layout/Navbar';
 import Landing from './components/layout/Landing';
 import PrivateRoute from './components/private-route/PrivateRoute';

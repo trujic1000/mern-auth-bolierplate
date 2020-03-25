@@ -15,7 +15,14 @@ export const login = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await authAPI.login(data);
-      return response;
+      const { token } = response;
+      // Set token to local storage
+      localStorage.setItem('token', token);
+      // Set token to Auth header
+      setAuthToken(token);
+      // Decode token to get user data
+      const user = jwt_decode(token);
+      return user;
     } catch (error) {
       return rejectWithValue(error.data);
     }
@@ -27,7 +34,14 @@ export const register = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await authAPI.register(data);
-      return response;
+      const { token } = response;
+      // Set token to local storage
+      localStorage.setItem('token', token);
+      // Set token to Auth header
+      setAuthToken(token);
+      // Decode token to get user data
+      const decoded = jwt_decode(token);
+      return decoded.user;
     } catch (error) {
       return rejectWithValue(error.data);
     }
@@ -55,6 +69,12 @@ const auth = createSlice({
       state.isAuthenticated = false;
       state.user = {};
       state.errors = {};
+    },
+    clearErrors: (state, action) => {
+      // Clear errors if there are some in the state
+      if (Object.keys(state.errors).length > 0) {
+        state.errors = {};
+      }
     }
   },
   extraReducers: {
@@ -70,17 +90,9 @@ const auth = createSlice({
     },
     [register.fulfilled]: (state, action) => {
       if (state.loading === 'pending') {
-        const { token } = action.payload;
-        // Set token to local storage
-        localStorage.setItem('token', token);
-        // Set token to Auth header
-        setAuthToken(token);
-        // Decode token to get user data
-        const decoded = jwt_decode(token);
-        // Change state
         state.loading = 'idle';
         state.isAuthenticated = true;
-        state.user = decoded.user;
+        state.user = action.payload;
       }
     },
     [register.rejected]: (state, action) => {
@@ -91,17 +103,9 @@ const auth = createSlice({
     },
     [login.fulfilled]: (state, action) => {
       if (state.loading === 'pending') {
-        const { token } = action.payload;
-        // Set token to local storage
-        localStorage.setItem('token', token);
-        // Set token to Auth header
-        setAuthToken(token);
-        // Decode token to get user data
-        const decoded = jwt_decode(token);
-        // Change state
         state.loading = 'idle';
         state.isAuthenticated = true;
-        state.user = decoded.user;
+        state.user = action.payload;
       }
     },
     [login.rejected]: (state, action) => {
@@ -113,5 +117,10 @@ const auth = createSlice({
   }
 });
 
-export const { setCurrentUser, logoutUser, authFailed } = auth.actions;
+export const {
+  setCurrentUser,
+  logoutUser,
+  authFailed,
+  clearErrors
+} = auth.actions;
 export default auth.reducer;

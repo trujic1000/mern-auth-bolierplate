@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { login } from 'features/auth/authSlice';
 import classnames from 'classnames';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { login, clearErrors } from 'features/auth/authSlice';
+import Icon from 'assets/Icon';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const errors = useSelector(state => state.auth.errors);
-  const isAuth = useSelector(state => state.auth.isAuthenticated);
+  const { errors, isAuthenticated, loading } = useSelector(state => state.auth);
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   // If logged in and user navigates to Login page, should redirect them to dashboard
   useEffect(() => {
-    if (isAuth) history.push('/dashboard');
-  }, [isAuth]);
+    if (isAuthenticated) history.push('/dashboard');
+  }, [isAuthenticated]);
 
   const onSubmit = e => {
     e.preventDefault();
@@ -34,7 +35,11 @@ const Login = () => {
     <div className='container'>
       <div style={{ marginTop: '4rem' }} className='row'>
         <div className='col s8 offset-s2'>
-          <Link to='/' className='btn-flat waves-effect'>
+          <Link
+            to='/'
+            onClick={() => dispatch(clearErrors())}
+            className='btn-flat waves-effect'
+          >
             <i className='material-icons left'>keyboard_backspace</i> Back to
             home
           </Link>
@@ -81,12 +86,20 @@ const Login = () => {
                   width: '150px',
                   borderRadius: '3px',
                   letterSpacing: '1.5px',
-                  marginTop: '1rem'
+                  marginTop: '1rem',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
                 }}
                 type='submit'
                 className='btn btn-large waves-effect waves-light hoverable blue accent-3'
+                disabled={loading === 'pending'}
               >
-                Login
+                {loading === 'pending' ? (
+                  <Icon name='spinner' />
+                ) : (
+                  <span>Login</span>
+                )}
               </button>
             </div>
           </form>
