@@ -1,28 +1,28 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import jwt_decode from 'jwt-decode';
-import authAPI from 'api/authAPI';
-import setAuthToken from 'utils/setAuthToken';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import jwt_decode from "jwt-decode";
+import authAPI from "api/authAPI";
+import setAuthToken from "utils/setAuthToken";
 
 let initialState = {
   isAuthenticated: false,
   user: {},
   errors: {},
-  loading: 'idle'
+  loading: "idle"
 };
 
 export const login = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async (data, { rejectWithValue }) => {
     try {
       const response = await authAPI.login(data);
       const { token } = response;
       // Set token to local storage
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
       // Set token to Auth header
       setAuthToken(token);
       // Decode token to get user data
-      const user = jwt_decode(token);
-      return user;
+      const decoded = jwt_decode(token);
+      return decoded.user;
     } catch (error) {
       return rejectWithValue(error.data);
     }
@@ -30,13 +30,13 @@ export const login = createAsyncThunk(
 );
 
 export const register = createAsyncThunk(
-  'auth/register',
+  "auth/register",
   async (data, { rejectWithValue }) => {
     try {
       const response = await authAPI.register(data);
       const { token } = response;
       // Set token to local storage
-      localStorage.setItem('token', token);
+      localStorage.setItem("token", token);
       // Set token to Auth header
       setAuthToken(token);
       // Decode token to get user data
@@ -49,7 +49,7 @@ export const register = createAsyncThunk(
 );
 
 const auth = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setCurrentUser: (state, action) => {
@@ -62,7 +62,7 @@ const auth = createSlice({
     },
     logoutUser: state => {
       // Remove token from local storage
-      localStorage.removeItem('token');
+      localStorage.removeItem("token");
       // Remove auth header for future requests
       setAuthToken(false);
       // Set isAuthenticated to false and user to {}
@@ -79,38 +79,38 @@ const auth = createSlice({
   },
   extraReducers: {
     [register.pending]: (state, action) => {
-      if (state.loading === 'idle') {
-        state.loading = 'pending';
+      if (state.loading === "idle") {
+        state.loading = "pending";
       }
     },
     [login.pending]: (state, action) => {
-      if (state.loading === 'idle') {
-        state.loading = 'pending';
+      if (state.loading === "idle") {
+        state.loading = "pending";
       }
     },
     [register.fulfilled]: (state, action) => {
-      if (state.loading === 'pending') {
-        state.loading = 'idle';
+      if (state.loading === "pending") {
+        state.loading = "idle";
         state.isAuthenticated = true;
         state.user = action.payload;
       }
     },
     [register.rejected]: (state, action) => {
-      if (state.loading === 'pending') {
-        state.loading = 'idle';
+      if (state.loading === "pending") {
+        state.loading = "idle";
         state.errors = action.payload;
       }
     },
     [login.fulfilled]: (state, action) => {
-      if (state.loading === 'pending') {
-        state.loading = 'idle';
+      if (state.loading === "pending") {
+        state.loading = "idle";
         state.isAuthenticated = true;
         state.user = action.payload;
       }
     },
     [login.rejected]: (state, action) => {
-      if (state.loading === 'pending') {
-        state.loading = 'idle';
+      if (state.loading === "pending") {
+        state.loading = "idle";
         state.errors = action.payload;
       }
     }
