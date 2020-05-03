@@ -1,7 +1,7 @@
 {
-  "name": "mern-app-boilerplate",
+  "name": "mern-auth-boilerplate",
   "version": "1.0.0",
-  "description": "MERN app boilerplate",
+  "description": "MERN auth boilerplate",
   "main": "server.js",
   "scripts": {
     "client-install": "npm install --prefix client",
