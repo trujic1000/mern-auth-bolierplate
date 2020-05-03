@@ -11,7 +11,7 @@ connectDB();
 app.use(express.json({ extended: false }));
 app.use(
   cors({
-    origin: "https://frozen-gorge-78423.herokuapp.com/",
+    origin: "https://mern-auth-bplate.herokuapp.com/",
   })
 );
 
