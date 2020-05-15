@@ -7,7 +7,7 @@ let initialState = {
   isAuthenticated: false,
   user: {},
   errors: {},
-  loading: "idle"
+  loading: "idle",
 };
 
 export const login = createAsyncThunk(
@@ -24,6 +24,7 @@ export const login = createAsyncThunk(
       const decoded = jwt_decode(token);
       return decoded.user;
     } catch (error) {
+      console.log("ERROR: ", error.data);
       return rejectWithValue(error.data);
     }
   }
@@ -60,7 +61,7 @@ const auth = createSlice({
       state.isAuthenticated = false;
       state.errors = action.payload;
     },
-    logoutUser: state => {
+    logoutUser: (state) => {
       // Remove token from local storage
       localStorage.removeItem("token");
       // Remove auth header for future requests
@@ -75,7 +76,7 @@ const auth = createSlice({
       if (Object.keys(state.errors).length > 0) {
         state.errors = {};
       }
-    }
+    },
   },
   extraReducers: {
     [register.pending]: (state, action) => {
@@ -113,14 +114,14 @@ const auth = createSlice({
         state.loading = "idle";
         state.errors = action.payload;
       }
-    }
-  }
+    },
+  },
 });
 
 export const {
   setCurrentUser,
   logoutUser,
   authFailed,
-  clearErrors
+  clearErrors,
 } = auth.actions;
 export default auth.reducer;

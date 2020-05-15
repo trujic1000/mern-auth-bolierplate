@@ -5,7 +5,7 @@ import axios from "axios";
  */
 export const client = axios.create({
   // TODO: Change it to use .env or config file
-  // baseURL: 'http://localhost:5000'
+  // baseURL: "http://localhost:5000",
   baseURL: "https://mern-auth-bplate.herokuapp.com/",
 });
 

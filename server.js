@@ -12,6 +12,7 @@ app.use(express.json({ extended: false }));
 app.use(
   cors({
     origin: "https://mern-auth-bplate.herokuapp.com/",
+    // origin: "http://localhost:3000",
   })
 );
 
